@@ -1,0 +1,7 @@
+.m2
+.vscode
+*.js
+*.d.ts
+!*.t.js
+maven-repo
+*.d.ts.map

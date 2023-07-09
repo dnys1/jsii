@@ -1,6 +1,6 @@
 # Superchain
 
-A [`debian:10-slim`][debian]-based Docker image bundling all the SDKs and tools
+A [`debian:11-slim`][debian]-based Docker image bundling all the SDKs and tools
 required in order to package [jsii] projects in all supported languages.
 
 [debian]: https://gallery.ecr.aws/debian/debian
@@ -15,7 +15,7 @@ SDK             | Version
 `mono`          | `>= 6.8.0.105`
 `Javascript`    | see [NodeJS and NPM](#nodejs-and-npm)
 `PowerShell`    | `pwsh >= 7.1.3`
-`Python 3`      | `python3 >= 3.7.4` with `pip3 >= 20.0.2`
+`Python 3`      | `python3 >= 3.9.2` with `pip3 >= 20.0.2`
 `Go`            | `go >= 1.18`
 
 ## Image tags

@@ -1,0 +1,36 @@
+{
+  "name": "@jsii/dart-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Dart runtime for the jsii engine",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com",
+    "email": "aws-jsii@amazon.com"
+  },
+  "homepage": "https://github.com/aws/jsii",
+  "bugs": {
+    "url": "https://github.com/aws/jsii/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aws/jsii.git",
+    "directory": "packages/@jsii/java-runtime"
+  },
+  "engines": {
+    "node": ">= 14.17.0"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "gen": "bash ./generate.sh",
+    "build": "tsc --build && npm run gen && cd project && mvn -version && mvn -B deploy -D altDeploymentRepository=local::default::file://${PWD}/../maven-repo --settings=user.xml -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false",
+    "dist-clean": "rm -rf dist maven-repo && cd project && mvn -B clean --settings=user.xml",
+    "test": "cd pkg && dart test",
+    "package": "package-java && package-private"
+  },
+  "devDependencies": {
+    "@jsii/runtime": "^0.0.0"
+  }
+}

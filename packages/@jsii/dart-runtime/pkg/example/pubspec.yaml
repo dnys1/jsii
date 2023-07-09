@@ -1,0 +1,13 @@
+name: jsii_runtime_example
+description: An example app showcasing the jsii_runtime package.
+version: 1.0.0
+
+environment:
+  sdk: '^3.0.0'
+
+dependencies:
+  jsii_runtime:
+    path: ../
+
+dev_dependencies:
+  amplify_lints: ^2.0.0

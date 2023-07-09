@@ -18,7 +18,7 @@
 ########################################################################################################################
 # Prepare install images of "manual" binary distributions (runs on BUILD platform for speed)
 ########################################################################################################################
-FROM --platform=${BUILDPLATFORM} public.ecr.aws/debian/debian:10 as bindist
+FROM --platform=${BUILDPLATFORM} public.ecr.aws/debian/debian:11 as bindist
 
 # Build & target platforms, they are provided by buildx and will look like "linux/amd64" or "linux/arm64"
 ARG BUILDPLATFORM
@@ -33,7 +33,8 @@ RUN echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sou
   && apt-get update                                                                                                     \
   && apt-get install -y gpg tar zsh                                                                                     \
   # We need a "recent" (>= 7.71) version of curl for --retry-all-errors, so we get it from backports...
-  && apt-get install -y -t buster-backports curl
+  && apt-get install -y -t buster-backports curl                                                                        \
+  && apt-get install unzip
 
 # We'll be using zsh substitutions, so ensuring this is the shell we use
 SHELL ["/bin/zsh", "-c"]
@@ -80,10 +81,37 @@ RUN curl -fSsL "https://golang.org/dl/go${GO_VERSION}.linux-${TARGETPLATFORM#lin
   && mkdir -p /opt/golang/go                                                                                            \
   && tar -xzf /tmp/go.tar.gz -C /opt/golang/go --strip-components=1
 
+# Prepare Dart distribution
+ARG DART_VERSION="3.0.5"
+ENV DART_SDK="/usr/lib/dart"
+WORKDIR /tmp
+RUN set -eux; \
+    case "$(dpkg --print-architecture)" in \
+        amd64) \
+            DART_SHA256=05fba372d64932dffce90bbd45116b76806bf9adc6203967b56faf5c64b2b66c; \
+            SDK_ARCH="x64";; \
+        armhf) \
+            DART_SHA256=ed151fd396522c09c41820e627eea8a72da973f7e0aeef8e8099c914b7fde2c1; \
+            SDK_ARCH="arm";; \
+        arm64) \
+            DART_SHA256=667b79593444cbe222a33c137ca943dced7a21ff2d61b8862f3b49e648c20533; \
+            SDK_ARCH="arm64";; \
+    esac; \
+    SDK="dartsdk-linux-${SDK_ARCH}-release.zip"; \
+    BASEURL="https://storage.googleapis.com/dart-archive/channels"; \
+    URL="$BASEURL/stable/release/${DART_VERSION}/sdk/$SDK"; \
+    echo "SDK: $URL" >> dart_setup.log ; \
+    curl -fLO "$URL"; \
+    echo "$DART_SHA256 *$SDK" \
+        | sha256sum --check --status --strict -; \
+    unzip "$SDK" && mv dart-sdk "$DART_SDK" && rm "$SDK" \
+        && chmod 755 "$DART_SDK" && chmod 755 "$DART_SDK/bin";
+WORKDIR /
+
 ########################################################################################################################
 # Set up the image
 ########################################################################################################################
-FROM public.ecr.aws/debian/debian:10-slim as staging
+FROM --platform=${BUILDPLATFORM} public.ecr.aws/debian/debian:11-slim as staging
 
 # Build & target platforms, they are provided by buildx and will look like "linux/amd64" or "linux/arm64"
 ARG BUILDPLATFORM
@@ -107,12 +135,15 @@ ENV LANG="C.UTF-8"                                                              
   M2_HOME="/opt/apache/maven"                                                                                           \
   M2="/opt/apache/maven/bin"                                                                                            \
   \
-  GOROOT="/opt/golang/go"
+  GOROOT="/opt/golang/go"                                                                                               \
+  \
+  DART_SDK="/usr/lib/dart"
 
 # Installing the system dependencies we need...
 RUN apt-get update                                                                                                      \
   && apt-get -y install                                                                                                 \
   apt-transport-https                                                                                                   \
+  apt-utils                                                                                                   \
   build-essential                                                                                                       \
   ca-certificates                                                                                                       \
   curl                                                                                                                  \
@@ -121,7 +152,7 @@ RUN apt-get update                                                              
   gnupg                                                                                                                 \
   gzip                                                                                                                  \
   libffi-dev                                                                                                            \
-  libicu63                                                                                                              \
+  libicu67                                                                                                              \
   libssl-dev                                                                                                            \
   openssl                                                                                                               \
   rsync                                                                                                                 \
@@ -130,6 +161,8 @@ RUN apt-get update                                                              
   zip                                                                                                                   \
   acl                                                                                                                   \
   && rm -rf /var/lib/apt/lists/*
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Install mono
 COPY superchain/gpg/mono.asc /tmp/mono.asc
@@ -207,6 +240,9 @@ COPY superchain/m2-settings.xml /root/.m2/settings.xml
 
 # Install Go
 COPY --from=bindist /opt/golang/go ${GOROOT}
+
+# Install Dart
+COPY --from=bindist /usr/lib/dart ${DART_SDK}
 
 # Install Node 14+ (configurable with '--build-arg NODE_MAJOR_VERSION=xxx') and yarn
 # (Put this as late as possible in the Dockerfile so we get to reuse the layer cache
@@ -380,8 +416,10 @@ ENV LANG="C.UTF-8"                                                              
   \
   GOROOT="/opt/golang/go"                                                                                               \
   RUSTUP_HOME="/usr/local/rustup"                                                                                       \
-  CARGO_HOME="/usr/local/cargo"
-ENV PATH="${PATH}:${CARGO_HOME}/bin:${GOROOT}/bin:${M2}"
+  CARGO_HOME="/usr/local/cargo"                                                                                         \
+  \
+  DART_SDK="/usr/lib/dart"
+ENV PATH="${PATH}:${CARGO_HOME}/bin:${GOROOT}/bin:${M2}:${DART_SDK}/bin"
 
 COPY --from=staging / /
 VOLUME /var/lib/docker

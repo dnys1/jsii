@@ -32,6 +32,9 @@ for (const name of fs.readdirSync(EXAMPLES_ROOT)) {
         distName: 'example-test.demo',
         module: 'example_test_demo',
       },
+      dart: {
+        packageName: 'example_test_demo',
+      },
     };
 
     const tmpdir = await fs.mkdtemp(
