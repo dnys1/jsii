@@ -1,5 +1,9 @@
 import 'package:aws_common/aws_common.dart';
 
+/// A recoverable error raised by the JSII runtime.
+///
+/// See also:
+/// - [JsiiError], a nonrecoverable error.
 abstract base class JsiiException
     with AWSSerializable<Map<String, Object?>>, AWSDebuggable
     implements Exception {
@@ -42,4 +46,14 @@ final class UnknownJsiiException extends JsiiException {
 
   @override
   String get runtimeTypeName => 'UnknownJsiiException';
+}
+
+/// A nonrecoverable error from the jsii runtime, usually the kernel.
+final class JsiiError extends Error {
+  JsiiError(this.error);
+
+  final String error;
+
+  @override
+  String toString() => 'JsiiError: $error';
 }

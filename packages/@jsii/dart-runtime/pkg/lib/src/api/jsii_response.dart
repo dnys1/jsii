@@ -1,8 +1,9 @@
 import 'dart:convert';
 
 import 'package:amplify_core/amplify_core.dart';
-import 'package:jsii_runtime/src/jsii_kernel.dart';
-import 'package:jsii_runtime/src/jsii_request.dart';
+import 'package:jsii_runtime/src/api/jsii_kernel.dart';
+import 'package:jsii_runtime/src/api/jsii_kernel_object.dart';
+import 'package:jsii_runtime/src/api/jsii_request.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'jsii_response.g.dart';
@@ -38,8 +39,12 @@ sealed class JsiiResponse extends StateMachineState<Never>
           types: types,
         ),
       {'byref': final String byRef} => JsiiCreateResponse(
-          byRef: byRef,
-          interfaces: json[r'$jsii.interfaces'] as List<String>?,
+          JsiiObjectRef(
+            byRef,
+            interfaces: (json[r'$jsii.interfaces'] as List<String>?)
+                ?.map(JsiiFqn.parse)
+                .toList(),
+          ),
         ),
       const {} => switch (pendingRequest) {
           JsiiDeleteRequest _ => const JsiiDeleteResponse(),
@@ -49,11 +54,14 @@ sealed class JsiiResponse extends StateMachineState<Never>
             ),
         },
       {'result': final Object? result} => switch (pendingRequest) {
-          JsiiGetRequest _ || JsiiStaticGetRequest _ => JsiiGetResponse(result),
+          JsiiGetRequest _ ||
+          JsiiStaticGetRequest _ =>
+            JsiiGetResponse(JsiiKernelObject.fromJson(result)),
           JsiiInvokeRequest _ ||
           JsiiStaticInvokeRequest _ =>
-            JsiiInvokeResponse(result),
-          JsiiEndAsyncRequest _ => JsiiEndResponse(result),
+            JsiiInvokeResponse(JsiiKernelObject.fromJson(result)),
+          JsiiEndAsyncRequest _ =>
+            JsiiEndResponse(JsiiKernelObject.fromJson(result)),
           _ => throw StateError(
               'Unexpected response for request: $pendingRequest '
               '(result: $result)',
@@ -80,7 +88,9 @@ sealed class JsiiResponse extends StateMachineState<Never>
           Callback.fromJson(callback),
         ),
       {'promiseid': final String promiseId} => JsiiBeginResponse(promiseId),
-      {'ok': final Object? ok} => JsiiOkayResponse(ok),
+      {'ok': final Object? value} => JsiiOkayResponse(
+          JsiiKernelObject.fromJson(value),
+        ),
       _ => throw ArgumentError.value(json, 'json', 'Invalid response'),
     };
   }
@@ -177,32 +187,22 @@ final class JsiiStatsResponse extends JsiiResponse {
 }
 
 @_serializable
-final class JsiiCreateResponse extends JsiiResponse with ObjectReference {
-  const JsiiCreateResponse({
-    required this.byRef,
-    this.interfaces,
-  });
+final class JsiiCreateResponse extends JsiiResponse {
+  const JsiiCreateResponse(this.objRef);
 
   factory JsiiCreateResponse.fromJson(Map<String, Object?> json) =>
       _$JsiiCreateResponseFromJson(json);
 
-  /// The object reference of the newly created object.
-  @override
-  @JsonKey(name: r'$jsii.byref')
-  final String byRef;
-
-  /// The list of interfaces implemented by the instance
-  @JsonKey(name: r'$jsii.interfaces')
-  final List<String>? interfaces;
+  final JsiiObjectRef objRef;
 
   @override
-  List<Object?> get props => [byRef, interfaces];
+  List<Object?> get props => [objRef];
 
   @override
   String get runtimeTypeName => 'JsiiCreateResponse';
 
   @override
-  Map<String, Object?> toJson() => _$JsiiCreateResponseToJson(this);
+  Map<String, Object?> toJson() => objRef.toJson();
 }
 
 @_serializable
@@ -263,7 +263,7 @@ sealed class Callback
         AWSDebuggable {
   const Callback({
     required this.cbid,
-    required this.objref,
+    required this.objRef,
     this.cookie,
   });
 
@@ -271,24 +271,21 @@ sealed class Callback
     return switch (json) {
       {'method': final String method} => InvokeCallback(
           cbid: json['cbid'] as String,
-          objref:
-              ObjectReference.fromJson(json['objref'] as Map<String, Object>),
+          objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, Object>),
           method: method,
           cookie: json['cookie'] as String?,
         ),
       {'property': final String property, 'value': final Object? value} =>
         SetCallback(
           cbid: json['cbid'] as String,
-          objref:
-              ObjectReference.fromJson(json['objref'] as Map<String, Object>),
+          objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, Object>),
           property: property,
-          value: value,
+          value: JsiiKernelObject.fromJson(value),
           cookie: json['cookie'] as String?,
         ),
       {'property': final String property} => GetCallback(
           cbid: json['cbid'] as String,
-          objref:
-              ObjectReference.fromJson(json['objref'] as Map<String, Object>),
+          objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, Object>),
           property: property,
           cookie: json['cookie'] as String?,
         ),
@@ -300,7 +297,7 @@ sealed class Callback
   final String cbid;
 
   /// The object on which the callback must be executed
-  final ObjectReference objref;
+  final JsiiObjectRef objRef;
 
   /// An arbitrary cookie string that was provided by the **host** app when the
   /// callback was requested.
@@ -313,7 +310,7 @@ sealed class Callback
 final class InvokeCallback extends Callback {
   const InvokeCallback({
     required super.cbid,
-    required super.objref,
+    required super.objRef,
     required this.method,
     super.cookie,
   });
@@ -322,7 +319,7 @@ final class InvokeCallback extends Callback {
   final String method;
 
   @override
-  List<Object?> get props => [cbid, objref, method, cookie];
+  List<Object?> get props => [cbid, objRef, method, cookie];
 
   @override
   String get runtimeTypeName => 'InvokeCallback';
@@ -335,7 +332,7 @@ final class InvokeCallback extends Callback {
 final class GetCallback extends Callback {
   const GetCallback({
     required super.cbid,
-    required super.objref,
+    required super.objRef,
     required this.property,
     super.cookie,
   });
@@ -344,7 +341,7 @@ final class GetCallback extends Callback {
   final String property;
 
   @override
-  List<Object?> get props => [cbid, objref, property, cookie];
+  List<Object?> get props => [cbid, objRef, property, cookie];
 
   @override
   String get runtimeTypeName => 'GetCallback';
@@ -357,7 +354,7 @@ final class GetCallback extends Callback {
 final class SetCallback extends Callback {
   const SetCallback({
     required super.cbid,
-    required super.objref,
+    required super.objRef,
     required this.property,
     required this.value,
     super.cookie,
@@ -367,10 +364,10 @@ final class SetCallback extends Callback {
   final String property;
 
   /// The value to set.
-  final Object? value;
+  final JsiiKernelObject value;
 
   @override
-  List<Object?> get props => [cbid, objref, property, value, cookie];
+  List<Object?> get props => [cbid, objRef, property, value, cookie];
 
   @override
   String get runtimeTypeName => 'SetCallback';
@@ -423,7 +420,7 @@ final class JsiiInvokeResponse extends JsiiResponse {
       _$JsiiInvokeResponseFromJson(json);
 
   /// The result of the method invocation.
-  final Object? result;
+  final JsiiKernelObject result;
 
   @override
   List<Object?> get props => [result];
@@ -465,7 +462,7 @@ final class JsiiEndResponse extends JsiiResponse {
       _$JsiiEndResponseFromJson(json);
 
   /// The result of the method invocation.
-  final Object? result;
+  final JsiiKernelObject result;
 
   @override
   List<Object?> get props => [result];
@@ -485,7 +482,7 @@ final class JsiiGetResponse extends JsiiResponse {
       _$JsiiGetResponseFromJson(json);
 
   /// The result of the property get operation.
-  final Object? result;
+  final JsiiKernelObject result;
 
   @override
   List<Object?> get props => [result];
@@ -521,7 +518,7 @@ final class JsiiOkayResponse extends JsiiResponse {
   factory JsiiOkayResponse.fromJson(Map<String, Object?> json) =>
       _$JsiiOkayResponseFromJson(json);
 
-  final Object? ok;
+  final JsiiKernelObject ok;
 
   @override
   List<Object?> get props => [ok];

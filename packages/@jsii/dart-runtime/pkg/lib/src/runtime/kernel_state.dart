@@ -1,6 +1,4 @@
-import 'package:amplify_core/amplify_core.dart';
-import 'package:jsii_runtime/src/exception.dart';
-import 'package:jsii_runtime/src/jsii_response.dart';
+part of 'jsii_runtime.dart';
 
 enum KernelStateType {
   uninitialized,
@@ -15,9 +13,11 @@ sealed class KernelState extends StateMachineState<KernelStateType> {
 
   const factory KernelState.uninitialized() = KernelUninitialized;
 
-  const factory KernelState.awaitingRequest() = KernelAwaitingRequest;
+  const factory KernelState.awaitingRequest([JsiiResponse? lastResponse]) =
+      KernelAwaitingRequest;
 
-  const factory KernelState.awaitingResponse() = KernelAwaitingResponse;
+  const factory KernelState.awaitingResponse(JsiiRequest request) =
+      KernelAwaitingResponse;
 
   const factory KernelState.failed(
     JsiiException exception,
@@ -44,29 +44,27 @@ final class KernelUninitialized extends KernelState {
 }
 
 final class KernelAwaitingRequest extends KernelState {
-  const KernelAwaitingRequest() : super(KernelStateType.awaitingRequest);
+  const KernelAwaitingRequest([this.lastResponse])
+      : super(KernelStateType.awaitingRequest);
+
+  final JsiiResponse? lastResponse;
 
   @override
-  List<Object?> get props => const [];
+  List<Object?> get props => [lastResponse];
 
   @override
   String get runtimeTypeName => 'KernelAwaitingRequest';
 }
 
-final class KernelReceivedResponse extends KernelAwaitingRequest {
-  const KernelReceivedResponse(this.response);
-
-  final JsiiResponse response;
-
-  @override
-  List<Object?> get props => [response];
-}
-
 final class KernelAwaitingResponse extends KernelState {
-  const KernelAwaitingResponse() : super(KernelStateType.awaitingResponse);
+  const KernelAwaitingResponse(this.request)
+      : super(KernelStateType.awaitingResponse);
+
+  /// The request that is currently being processed.
+  final JsiiRequest request;
 
   @override
-  List<Object?> get props => const [];
+  List<Object?> get props => [request];
 
   @override
   String get runtimeTypeName => 'KernelAwaitingResponse';

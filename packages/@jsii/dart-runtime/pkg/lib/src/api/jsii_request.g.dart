@@ -39,7 +39,9 @@ Map<String, dynamic> _$JsiiStatsRequestToJson(JsiiStatsRequest instance) =>
 JsiiCreateRequest _$JsiiCreateRequestFromJson(Map<String, dynamic> json) =>
     JsiiCreateRequest(
       fqn: JsiiFqn.fromJson(json['fqn'] as String),
-      args: (json['args'] as List<dynamic>?)?.map(JsonObject.fromJson).toList(),
+      args: (json['args'] as List<dynamic>?)
+          ?.map(JsiiKernelObject.fromJson)
+          .toList(),
       interfaces: (json['interfaces'] as List<dynamic>?)
           ?.map((e) => JsiiFqn.fromJson(e as String))
           .toList(),
@@ -84,7 +86,7 @@ JsiiCallbackSuccessRequest _$JsiiCallbackSuccessRequestFromJson(
         Map<String, dynamic> json) =>
     JsiiCallbackSuccessRequest(
       cbid: json['cbid'] as String,
-      result: JsonObject.fromJson(json['result']),
+      result: JsiiKernelObject.fromJson(json['result']),
     );
 
 Map<String, dynamic> _$JsiiCallbackSuccessRequestToJson(
@@ -120,24 +122,26 @@ Map<String, dynamic> _$JsiiCallbacksRequestToJson(
 
 JsiiDeleteRequest _$JsiiDeleteRequestFromJson(Map<String, dynamic> json) =>
     JsiiDeleteRequest(
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$JsiiDeleteRequestToJson(JsiiDeleteRequest instance) =>
     <String, dynamic>{
-      'objref': instance.objref.toJson(),
+      'objref': instance.objRef.toJson(),
     };
 
 JsiiInvokeRequest _$JsiiInvokeRequestFromJson(Map<String, dynamic> json) =>
     JsiiInvokeRequest(
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, dynamic>),
       method: json['method'] as String,
-      args: (json['args'] as List<dynamic>?)?.map(JsonObject.fromJson).toList(),
+      args: (json['args'] as List<dynamic>?)
+          ?.map(JsiiKernelObject.fromJson)
+          .toList(),
     );
 
 Map<String, dynamic> _$JsiiInvokeRequestToJson(JsiiInvokeRequest instance) =>
     <String, dynamic>{
-      'objref': instance.objref.toJson(),
+      'objref': instance.objRef.toJson(),
       'method': instance.method,
       'args': instance.args?.map((e) => e.toJson()).toList(),
     };
@@ -147,7 +151,9 @@ JsiiStaticInvokeRequest _$JsiiStaticInvokeRequestFromJson(
     JsiiStaticInvokeRequest(
       fqn: JsiiFqn.fromJson(json['fqn'] as String),
       method: json['method'] as String,
-      args: (json['args'] as List<dynamic>?)?.map(JsonObject.fromJson).toList(),
+      args: (json['args'] as List<dynamic>?)
+          ?.map(JsiiKernelObject.fromJson)
+          .toList(),
     );
 
 Map<String, dynamic> _$JsiiStaticInvokeRequestToJson(
@@ -161,15 +167,17 @@ Map<String, dynamic> _$JsiiStaticInvokeRequestToJson(
 JsiiBeginAsyncRequest _$JsiiBeginAsyncRequestFromJson(
         Map<String, dynamic> json) =>
     JsiiBeginAsyncRequest(
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, dynamic>),
       method: json['method'] as String,
-      args: (json['args'] as List<dynamic>?)?.map(JsonObject.fromJson).toList(),
+      args: (json['args'] as List<dynamic>?)
+          ?.map(JsiiKernelObject.fromJson)
+          .toList(),
     );
 
 Map<String, dynamic> _$JsiiBeginAsyncRequestToJson(
         JsiiBeginAsyncRequest instance) =>
     <String, dynamic>{
-      'objref': instance.objref.toJson(),
+      'objref': instance.objRef.toJson(),
       'method': instance.method,
       'args': instance.args?.map((e) => e.toJson()).toList(),
     };
@@ -187,13 +195,13 @@ Map<String, dynamic> _$JsiiEndAsyncRequestToJson(
 
 JsiiGetRequest _$JsiiGetRequestFromJson(Map<String, dynamic> json) =>
     JsiiGetRequest(
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, dynamic>),
       property: json['property'] as String,
     );
 
 Map<String, dynamic> _$JsiiGetRequestToJson(JsiiGetRequest instance) =>
     <String, dynamic>{
-      'objref': instance.objref.toJson(),
+      'objref': instance.objRef.toJson(),
       'property': instance.property,
     };
 
@@ -213,14 +221,14 @@ Map<String, dynamic> _$JsiiStaticGetRequestToJson(
 
 JsiiSetRequest _$JsiiSetRequestFromJson(Map<String, dynamic> json) =>
     JsiiSetRequest(
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objref'] as Map<String, dynamic>),
       property: json['property'] as String,
-      value: JsonObject.fromJson(json['value']),
+      value: JsiiKernelObject.fromJson(json['value']),
     );
 
 Map<String, dynamic> _$JsiiSetRequestToJson(JsiiSetRequest instance) =>
     <String, dynamic>{
-      'objref': instance.objref.toJson(),
+      'objref': instance.objRef.toJson(),
       'property': instance.property,
       'value': instance.value.toJson(),
     };
@@ -230,7 +238,7 @@ JsiiStaticSetRequest _$JsiiStaticSetRequestFromJson(
     JsiiStaticSetRequest(
       fqn: JsiiFqn.fromJson(json['fqn'] as String),
       property: json['property'] as String,
-      value: JsonObject.fromJson(json['value']),
+      value: JsiiKernelObject.fromJson(json['value']),
     );
 
 Map<String, dynamic> _$JsiiStaticSetRequestToJson(

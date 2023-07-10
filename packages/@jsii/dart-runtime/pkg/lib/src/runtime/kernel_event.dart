@@ -1,9 +1,4 @@
-import 'package:amplify_core/amplify_core.dart';
-import 'package:jsii_runtime/src/jsii_request.dart';
-import 'package:jsii_runtime/src/jsii_response.dart';
-import 'package:jsii_runtime/src/state/exception.dart';
-import 'package:jsii_runtime/src/state/state.dart';
-import 'package:meta/meta.dart';
+part of 'jsii_runtime.dart';
 
 enum KernelEventType {
   init,
@@ -35,7 +30,7 @@ sealed class KernelEvent
   PreconditionException? checkPrecondition(KernelState currentState) {
     switch (currentState) {
       case KernelTerminated _:
-        return const KernelPreconditionException(
+        return const RuntimePreconditionException(
           'Cannot transition from terminated state',
         );
       default:
@@ -50,13 +45,14 @@ sealed class KernelEvent
 final class KernelInitEvent extends KernelEvent {
   const KernelInitEvent({
     required this.runtime,
-    required this.nodeExecutable,
+    required String? nodeExecutable,
     required this.jsiiDebug,
     required this.traceEnabled,
-  }) : super(KernelEventType.init);
+  })  : nodeExecutable = nodeExecutable ?? 'node',
+        super(KernelEventType.init);
 
   final String? runtime;
-  final String? nodeExecutable;
+  final String nodeExecutable;
   final String? jsiiDebug;
   final bool traceEnabled;
 
@@ -67,7 +63,7 @@ final class KernelInitEvent extends KernelEvent {
     }
     return switch (currentState) {
       KernelUninitialized _ => null,
-      _ => const KernelPreconditionException(
+      _ => const RuntimePreconditionException(
           'The kernel has already been initialized',
           shouldEmit: false,
         ),
@@ -98,7 +94,7 @@ final class KernelRequestEvent extends KernelEvent {
     }
     return switch (currentState) {
       KernelAwaitingRequest _ => null,
-      _ => const KernelPreconditionException(
+      _ => const RuntimePreconditionException(
           'The kernel cannot accept requests at this time',
         ),
     };
@@ -129,7 +125,7 @@ final class KernelTerminateEvent extends KernelEvent {
   @override
   PreconditionException? checkPrecondition(KernelState currentState) {
     return switch (currentState) {
-      KernelTerminated _ => const KernelPreconditionException(
+      KernelTerminated _ => const RuntimePreconditionException(
           'The kernel has already been terminated',
           shouldEmit: false,
         ),

@@ -52,16 +52,12 @@ Map<String, dynamic> _$JsiiStatsResponseToJson(JsiiStatsResponse instance) =>
 
 JsiiCreateResponse _$JsiiCreateResponseFromJson(Map<String, dynamic> json) =>
     JsiiCreateResponse(
-      byRef: json[r'$jsii.byref'] as String,
-      interfaces: (json[r'$jsii.interfaces'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
+      JsiiObjectRef.fromJson(json['objRef'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$JsiiCreateResponseToJson(JsiiCreateResponse instance) =>
     <String, dynamic>{
-      r'$jsii.byref': instance.byRef,
-      r'$jsii.interfaces': instance.interfaces,
+      'objRef': instance.objRef.toJson(),
     };
 
 JsiiErrorResponse _$JsiiErrorResponseFromJson(Map<String, dynamic> json) =>
@@ -94,7 +90,7 @@ Map<String, dynamic> _$JsiiCallbackRequestToJson(
 InvokeCallback _$InvokeCallbackFromJson(Map<String, dynamic> json) =>
     InvokeCallback(
       cbid: json['cbid'] as String,
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objRef'] as Map<String, dynamic>),
       method: json['method'] as String,
       cookie: json['cookie'] as String?,
     );
@@ -102,14 +98,14 @@ InvokeCallback _$InvokeCallbackFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$InvokeCallbackToJson(InvokeCallback instance) =>
     <String, dynamic>{
       'cbid': instance.cbid,
-      'objref': instance.objref.toJson(),
+      'objRef': instance.objRef.toJson(),
       'cookie': instance.cookie,
       'method': instance.method,
     };
 
 GetCallback _$GetCallbackFromJson(Map<String, dynamic> json) => GetCallback(
       cbid: json['cbid'] as String,
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objRef'] as Map<String, dynamic>),
       property: json['property'] as String,
       cookie: json['cookie'] as String?,
     );
@@ -117,26 +113,26 @@ GetCallback _$GetCallbackFromJson(Map<String, dynamic> json) => GetCallback(
 Map<String, dynamic> _$GetCallbackToJson(GetCallback instance) =>
     <String, dynamic>{
       'cbid': instance.cbid,
-      'objref': instance.objref.toJson(),
+      'objRef': instance.objRef.toJson(),
       'cookie': instance.cookie,
       'property': instance.property,
     };
 
 SetCallback _$SetCallbackFromJson(Map<String, dynamic> json) => SetCallback(
       cbid: json['cbid'] as String,
-      objref: ObjectReference.fromJson(json['objref'] as Map<String, dynamic>),
+      objRef: JsiiObjectRef.fromJson(json['objRef'] as Map<String, dynamic>),
       property: json['property'] as String,
-      value: json['value'],
+      value: JsiiKernelObject.fromJson(json['value']),
       cookie: json['cookie'] as String?,
     );
 
 Map<String, dynamic> _$SetCallbackToJson(SetCallback instance) =>
     <String, dynamic>{
       'cbid': instance.cbid,
-      'objref': instance.objref.toJson(),
+      'objRef': instance.objRef.toJson(),
       'cookie': instance.cookie,
       'property': instance.property,
-      'value': instance.value,
+      'value': instance.value.toJson(),
     };
 
 JsiiCallbacksResponse _$JsiiCallbacksResponseFromJson(
@@ -161,12 +157,12 @@ Map<String, dynamic> _$JsiiDeleteResponseToJson(JsiiDeleteResponse instance) =>
 
 JsiiInvokeResponse _$JsiiInvokeResponseFromJson(Map<String, dynamic> json) =>
     JsiiInvokeResponse(
-      json['result'],
+      JsiiKernelObject.fromJson(json['result']),
     );
 
 Map<String, dynamic> _$JsiiInvokeResponseToJson(JsiiInvokeResponse instance) =>
     <String, dynamic>{
-      'result': instance.result,
+      'result': instance.result.toJson(),
     };
 
 JsiiBeginResponse _$JsiiBeginResponseFromJson(Map<String, dynamic> json) =>
@@ -181,22 +177,22 @@ Map<String, dynamic> _$JsiiBeginResponseToJson(JsiiBeginResponse instance) =>
 
 JsiiEndResponse _$JsiiEndResponseFromJson(Map<String, dynamic> json) =>
     JsiiEndResponse(
-      json['result'],
+      JsiiKernelObject.fromJson(json['result']),
     );
 
 Map<String, dynamic> _$JsiiEndResponseToJson(JsiiEndResponse instance) =>
     <String, dynamic>{
-      'result': instance.result,
+      'result': instance.result.toJson(),
     };
 
 JsiiGetResponse _$JsiiGetResponseFromJson(Map<String, dynamic> json) =>
     JsiiGetResponse(
-      json['result'],
+      JsiiKernelObject.fromJson(json['result']),
     );
 
 Map<String, dynamic> _$JsiiGetResponseToJson(JsiiGetResponse instance) =>
     <String, dynamic>{
-      'result': instance.result,
+      'result': instance.result.toJson(),
     };
 
 JsiiSetResponse _$JsiiSetResponseFromJson(Map<String, dynamic> json) =>
@@ -207,10 +203,10 @@ Map<String, dynamic> _$JsiiSetResponseToJson(JsiiSetResponse instance) =>
 
 JsiiOkayResponse _$JsiiOkayResponseFromJson(Map<String, dynamic> json) =>
     JsiiOkayResponse(
-      json['ok'],
+      JsiiKernelObject.fromJson(json['ok']),
     );
 
 Map<String, dynamic> _$JsiiOkayResponseToJson(JsiiOkayResponse instance) =>
     <String, dynamic>{
-      'ok': instance.ok,
+      'ok': instance.ok.toJson(),
     };

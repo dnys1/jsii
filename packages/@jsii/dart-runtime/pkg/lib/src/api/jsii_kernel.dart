@@ -2,14 +2,6 @@
 library jsii_kernel;
 
 import 'package:aws_common/aws_common.dart';
-import 'package:json_annotation/json_annotation.dart';
-
-part 'jsii_kernel.g.dart';
-
-const _serializable = JsonSerializable(
-  createFactory: false,
-  explicitToJson: true,
-);
 
 final class JsiiFqn with AWSEquatable<JsiiFqn>, AWSSerializable<String> {
   const JsiiFqn({
@@ -90,51 +82,4 @@ final class JsiiKernelTypes {
     namespace: '@jsii/kernel',
     type: 'RuntimeError',
   );
-}
-
-abstract mixin class ObjectReference
-    implements AWSSerializable<Map<String, Object?>> {
-  const factory ObjectReference(String byRef) = _ObjectReference;
-
-  factory ObjectReference.fromJson(Map<String, Object?> json) {
-    if (json case {r'$jsii.byref': final String byRef}) {
-      return ObjectReference(byRef);
-    }
-    throw ArgumentError.value(json, 'json', 'Invalid object reference');
-  }
-
-  /// A handle that uniquely identifies an instance.
-  String get byRef;
-
-  /// The object instance's base class' jsii fully qualified name.
-  JsiiFqn get fqn => JsiiFqn.parse((byRef.split('@')..removeLast()).join());
-
-  /// The object's opaque numeric identifier.
-  int get id => int.parse(byRef.split('@').last);
-}
-
-@_serializable
-final class _ObjectReference with ObjectReference {
-  const _ObjectReference(this.byRef);
-
-  @override
-  @JsonKey(name: r'$jsii.byref')
-  final String byRef;
-
-  @override
-  Map<String, Object?> toJson() => _$ObjectReferenceToJson(this);
-}
-
-final class JsonObject with AWSSerializable<Object?> {
-  const JsonObject(this.value);
-
-  const JsonObject.fromJson(this.value);
-
-  final Object? value;
-
-  @override
-  Object? toJson() => value;
-
-  @override
-  String toString() => value.toString();
 }

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:amplify_core/amplify_core.dart';
-import 'package:jsii_runtime/src/jsii_kernel.dart';
+import 'package:jsii_runtime/src/api/jsii_kernel.dart';
+import 'package:jsii_runtime/src/api/jsii_kernel_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'jsii_request.g.dart';
@@ -49,7 +50,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#creating-objects
   const factory JsiiRequest.create({
     required JsiiFqn fqn,
-    List<JsonObject>? args,
+    List<JsiiKernelObject>? args,
     List<JsiiFqn>? interfaces,
     List<Override>? overrides,
   }) = JsiiCreateRequest;
@@ -79,7 +80,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   ///
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#destroying-objects
   const factory JsiiRequest.delete({
-    required ObjectReference objref,
+    required JsiiObjectRef objRef,
   }) = JsiiDeleteRequest;
 
   /// Reports a successful callback execution.
@@ -87,7 +88,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#a-note-about-callbacks
   const factory JsiiRequest.callbackSuccess({
     required String cbid,
-    required JsonObject result,
+    required JsiiKernelObject result,
   }) = JsiiCallbackSuccessRequest;
 
   /// Reports an error that occurred during the execution of a callback.
@@ -108,9 +109,9 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   ///
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#invoking-methods-and-static-methods
   const factory JsiiRequest.invoke({
-    required ObjectReference objref,
+    required JsiiObjectRef objRef,
     required String method,
-    List<JsonObject>? args,
+    List<JsiiKernelObject>? args,
   }) = JsiiInvokeRequest;
 
   /// Invokes a static method on a jsii class.
@@ -119,7 +120,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   const factory JsiiRequest.staticInvoke({
     required JsiiFqn fqn,
     required String method,
-    List<JsonObject>? args,
+    List<JsiiKernelObject>? args,
   }) = JsiiStaticInvokeRequest;
 
   /// Begins an asynchronous method invocation on a jsii object.
@@ -138,9 +139,9 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   ///
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#asynchronous-method-invocation
   const factory JsiiRequest.beginAsync({
-    required ObjectReference objref,
+    required JsiiObjectRef objRef,
     required String method,
-    List<JsonObject>? args,
+    List<JsiiKernelObject>? args,
   }) = JsiiBeginAsyncRequest;
 
   /// Ends an asynchronous method invocation on a jsii object.
@@ -154,7 +155,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   ///
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#invoking-getters-and-static-getters
   const factory JsiiRequest.get({
-    required ObjectReference objref,
+    required JsiiObjectRef objRef,
     required String property,
   }) = JsiiGetRequest;
 
@@ -173,9 +174,9 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   ///
   /// See: https://aws.github.io/jsii/specification/3-kernel-api/#invoking-setters-and-static-setters
   const factory JsiiRequest.set({
-    required ObjectReference objref,
+    required JsiiObjectRef objRef,
     required String property,
-    required JsonObject value,
+    required JsiiKernelObject value,
   }) = JsiiSetRequest;
 
   /// Sets the value of a static property on a jsii class.
@@ -184,7 +185,7 @@ sealed class JsiiRequest extends StateMachineEvent<Never, Never>
   const factory JsiiRequest.staticSet({
     required JsiiFqn fqn,
     required String property,
-    required JsonObject value,
+    required JsiiKernelObject value,
   }) = JsiiStaticSetRequest;
 
   /// Requests the kernel to exit.
@@ -290,7 +291,7 @@ final class JsiiCreateRequest extends JsiiRequest {
   /// The arguments to pass to the constructor.
   ///
   /// **Note**: The `Object` type ([JsiiFqn.object]) accepts no arguments.
-  final List<JsonObject>? args;
+  final List<JsiiKernelObject>? args;
 
   /// Additional interfaces implemented in the host app.
   ///
@@ -428,7 +429,7 @@ final class JsiiCallbackSuccessRequest extends JsiiCallbackCompletion {
       _$JsiiCallbackSuccessRequestFromJson(json);
 
   /// The result of the execution (`null` if void).
-  final JsonObject result;
+  final JsiiKernelObject result;
 
   @override
   List<Object?> get props => [cbid, result];
@@ -487,17 +488,18 @@ final class JsiiCallbacksRequest extends JsiiRequest {
 @_serializable
 final class JsiiDeleteRequest extends JsiiRequest {
   const JsiiDeleteRequest({
-    required this.objref,
+    required this.objRef,
   }) : super('del');
 
   factory JsiiDeleteRequest.fromJson(Map<String, Object?> json) =>
       _$JsiiDeleteRequestFromJson(json);
 
   /// The object to delete.
-  final ObjectReference objref;
+  @JsonKey(name: 'objref')
+  final JsiiObjectRef objRef;
 
   @override
-  List<Object?> get props => [objref];
+  List<Object?> get props => [objRef];
 
   @override
   String get runtimeTypeName => 'JsiiDeleteRequest';
@@ -509,7 +511,7 @@ final class JsiiDeleteRequest extends JsiiRequest {
 @_serializable
 final class JsiiInvokeRequest extends JsiiRequest {
   const JsiiInvokeRequest({
-    required this.objref,
+    required this.objRef,
     required this.method,
     this.args,
   }) : super('invoke');
@@ -518,16 +520,17 @@ final class JsiiInvokeRequest extends JsiiRequest {
       _$JsiiInvokeRequestFromJson(json);
 
   /// The object on which the method must be invoked.
-  final ObjectReference objref;
+  @JsonKey(name: 'objref')
+  final JsiiObjectRef objRef;
 
   /// The name of the method to invoke.
   final String method;
 
   /// The arguments to pass to the method.
-  final List<JsonObject>? args;
+  final List<JsiiKernelObject>? args;
 
   @override
-  List<Object?> get props => [objref, method, args];
+  List<Object?> get props => [objRef, method, args];
 
   @override
   String get runtimeTypeName => 'JsiiInvokeRequest';
@@ -554,7 +557,7 @@ final class JsiiStaticInvokeRequest extends JsiiRequest {
   final String method;
 
   /// The arguments to pass to the method.
-  final List<JsonObject>? args;
+  final List<JsiiKernelObject>? args;
 
   @override
   List<Object?> get props => [fqn, method, args];
@@ -569,7 +572,7 @@ final class JsiiStaticInvokeRequest extends JsiiRequest {
 @_serializable
 final class JsiiBeginAsyncRequest extends JsiiRequest {
   const JsiiBeginAsyncRequest({
-    required this.objref,
+    required this.objRef,
     required this.method,
     this.args,
   }) : super('begin');
@@ -578,16 +581,17 @@ final class JsiiBeginAsyncRequest extends JsiiRequest {
       _$JsiiBeginAsyncRequestFromJson(json);
 
   /// The object on which the method must be invoked.
-  final ObjectReference objref;
+  @JsonKey(name: 'objref')
+  final JsiiObjectRef objRef;
 
   /// The name of the method to invoke.
   final String method;
 
   /// The arguments to pass to the method.
-  final List<JsonObject>? args;
+  final List<JsiiKernelObject>? args;
 
   @override
-  List<Object?> get props => [objref, method, args];
+  List<Object?> get props => [objRef, method, args];
 
   @override
   String get runtimeTypeName => 'JsiiBeginAsyncRequest';
@@ -622,7 +626,7 @@ final class JsiiEndAsyncRequest extends JsiiRequest {
 @_serializable
 final class JsiiGetRequest extends JsiiRequest {
   const JsiiGetRequest({
-    required this.objref,
+    required this.objRef,
     required this.property,
   }) : super('get');
 
@@ -630,13 +634,14 @@ final class JsiiGetRequest extends JsiiRequest {
       _$JsiiGetRequestFromJson(json);
 
   /// The object on which the property must be retrieved.
-  final ObjectReference objref;
+  @JsonKey(name: 'objref')
+  final JsiiObjectRef objRef;
 
   /// The name of the property to retrieve.
   final String property;
 
   @override
-  List<Object?> get props => [objref, property];
+  List<Object?> get props => [objRef, property];
 
   @override
   String get runtimeTypeName => 'JsiiGetRequest';
@@ -675,7 +680,7 @@ final class JsiiStaticGetRequest extends JsiiRequest {
 @_serializable
 final class JsiiSetRequest extends JsiiRequest {
   const JsiiSetRequest({
-    required this.objref,
+    required this.objRef,
     required this.property,
     required this.value,
   }) : super('set');
@@ -684,16 +689,17 @@ final class JsiiSetRequest extends JsiiRequest {
       _$JsiiSetRequestFromJson(json);
 
   /// The object on which the property must be set.
-  final ObjectReference objref;
+  @JsonKey(name: 'objref')
+  final JsiiObjectRef objRef;
 
   /// The name of the property to set.
   final String property;
 
   /// The value to set.
-  final JsonObject value;
+  final JsiiKernelObject value;
 
   @override
-  List<Object?> get props => [objref, property, value];
+  List<Object?> get props => [objRef, property, value];
 
   @override
   String get runtimeTypeName => 'JsiiSetRequest';
@@ -720,7 +726,7 @@ final class JsiiStaticSetRequest extends JsiiRequest {
   final String property;
 
   /// The value to set.
-  final JsonObject value;
+  final JsiiKernelObject value;
 
   @override
   List<Object?> get props => [fqn, property, value];
@@ -749,5 +755,5 @@ final class JsiiExitRequest extends JsiiRequest {
   String get runtimeTypeName => 'JsiiExitRequest';
 
   @override
-  Map<String, Object?> toJson() => _$JsiiExitRequestToJson(this);
+  Map<String, Object?> toJson() => {'exit': code};
 }

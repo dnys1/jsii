@@ -1,16 +1,18 @@
+@internal
+library;
+
 import 'package:meta/meta.dart';
 
 abstract class JsiiModule {
   const JsiiModule({
     required this.name,
     required this.version,
-    required this.resourceName,
+    required this.tarball,
   });
 
   final String name;
   final String version;
-  final String resourceName;
+  final String tarball;
 
-  @protected
   List<JsiiModule> get dependencies => const [];
 }

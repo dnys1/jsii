@@ -1,14 +1,16 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'jsii_kernel.dart';
+part of 'jsii_kernel_object.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Map<String, dynamic> _$ObjectReferenceToJson(_ObjectReference instance) =>
+Map<String, dynamic> _$JsiiObjectRefToJson(JsiiObjectRef instance) =>
     <String, dynamic>{
+      r'$jsii.byref': instance.byRef,
+      r'$jsii.interfaces': instance.interfaces,
       'fqn': instance.fqn.toJson(),
       'id': instance.id,
-      r'$jsii.byref': instance.byRef,
+      'value': instance.value,
     };
